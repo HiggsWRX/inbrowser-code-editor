@@ -25,18 +25,18 @@ const reducer = produce(
       case ActionType.UPDATE_CELL:
         const { id, content } = action.payload;
         state.data[id].content = content;
-        return;
+        return state;
       case ActionType.DELETE_CELL:
         delete state.data[action.payload];
         state.order = state.order.filter((id) => id !== action.payload);
-        return;
+        return state;
       case ActionType.MOVE_CELL:
         const { direction } = action.payload;
         const index = state.order.findIndex((id) => id === action.payload.id);
         const targetIndex = direction === "up" ? index - 1 : index + 1;
 
         if (targetIndex < 0 || targetIndex >= state.order.length - 1) {
-          return;
+          return state;
         }
 
         // swap elements in array with destructuring
@@ -47,11 +47,32 @@ const reducer = produce(
 
         return state;
       case ActionType.INSERT_CELL_BEFORE:
+        const cell: Cell = {
+          id: randomId(),
+          content: "",
+          type: action.payload.type,
+        };
+
+        state.data[cell.id] = cell;
+
+        const indexToInsertAt = state.order.findIndex(
+          (id) => id === action.payload.id
+        );
+
+        if (indexToInsertAt < 0) {
+          state.order.push(cell.id);
+        } else {
+          state.order.splice(indexToInsertAt, 0, cell.id);
+        }
         return state;
       default:
         return state;
     }
   }
 );
+
+const randomId = () => {
+  return Math.random().toString(36).substring(2, 5);
+};
 
 export default reducer;
