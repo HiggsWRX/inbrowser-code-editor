@@ -31,6 +31,20 @@ const reducer = produce(
         state.order = state.order.filter((id) => id !== action.payload);
         return;
       case ActionType.MOVE_CELL:
+        const { direction } = action.payload;
+        const index = state.order.findIndex((id) => id === action.payload.id);
+        const targetIndex = direction === "up" ? index - 1 : index + 1;
+
+        if (targetIndex < 0 || targetIndex >= state.order.length - 1) {
+          return;
+        }
+
+        // swap elements in array with destructuring
+        [state.order[index], state.order[targetIndex]] = [
+          state.order[targetIndex],
+          state.order[index],
+        ];
+
         return state;
       case ActionType.INSERT_CELL_BEFORE:
         return state;
